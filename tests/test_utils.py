@@ -1,8 +1,9 @@
 # test_utils.py
 import pytest
+from datetime import datetime
 from unittest.mock import patch, MagicMock, mock_open
-from src.utils import save_log_to_s3, get_zoho_secret, test_get_access_token, test_download_ca_certificate, test_get_leads_collection
-from src.constants import *
+from utils import save_log_to_s3, get_zoho_secret, test_get_access_token, test_download_ca_certificate, test_get_leads_collection
+from constants import *
 
 # Mock the S3 client interaction for save_log_to_s3 function
 @patch('src.config.boto3.client')

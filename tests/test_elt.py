@@ -1,7 +1,7 @@
 # test_etl.py
 import pytest
 from unittest.mock import patch, MagicMock
-from src.etl import main
+from etl import main
 
 # Mock all utility functions used in the main ETL flow
 @patch('src.etl.save_log_to_s3')

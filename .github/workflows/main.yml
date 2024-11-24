@@ -24,10 +24,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Set PYTHONPATH explicitly
-      run: |
-        echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
-        echo "PYTHONPATH=$PYTHONPATH:$(pwd)/src" >> ~/.bashrc
+    # - name: Set PYTHONPATH explicitly
+    #   run: |
+    #     echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
+    #     echo "PYTHONPATH=$PYTHONPATH:$(pwd)/src" >> ~/.bashrc
 
     - name: Install dependencies
       run: |
@@ -35,4 +35,4 @@ jobs:
 
     - name: Run tests
       run: |
-        PYTHONPATH=$(pwd)/src pytest tests/
+        pytest tests/
