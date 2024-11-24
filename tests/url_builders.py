@@ -1,4 +1,4 @@
-from utils import get_zoho_secret
+from shared import get_zoho_secret
 from constants import ZOHO_CRM_CREDENTIAL, ZOHO_BASE_URL, ZOHO_REFRESH_TOKEN, ZOHO_CLIENT_ID, ZOHO_SECRET, CA_CERTIFICATE_BASE_URL, CA_CERTIFICATE_REGION
 
 # Build the token URL as a global variable
