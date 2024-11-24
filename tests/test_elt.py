@@ -4,11 +4,11 @@ from unittest.mock import patch, MagicMock
 from etl import main
 
 # Mock all utility functions used in the main ETL flow
-@patch('src.etl.save_log_to_s3')
-@patch('src.etl.fetch_leads')
-@patch('src.etl.incremental_load')
-@patch('src.etl.backup_mongo_data_to_s3')
-@patch('src.etl.validate_data')
+@patch('etl.save_log_to_s3')
+@patch('etl.fetch_leads')
+@patch('etl.incremental_load')
+@patch('etl.backup_mongo_data_to_s3')
+@patch('etl.validate_data')
 def test_etl_process(mock_validate_data, mock_backup_mongo_data_to_s3, mock_incremental_load, mock_fetch_leads, mock_save_log_to_s3):
     # Mock return values for each function
     mock_fetch_leads.return_value = [{'lead_id': 1, 'name': 'Test Lead'}]  # Example lead data
@@ -42,11 +42,11 @@ def test_etl_process(mock_validate_data, mock_backup_mongo_data_to_s3, mock_incr
 
 
 # Mock for failure case
-@patch('src.etl.save_log_to_s3')
-@patch('src.etl.fetch_leads')
-@patch('src.etl.incremental_load')
-@patch('src.etl.backup_mongo_data_to_s3')
-@patch('src.etl.validate_data')
+@patch('etl.save_log_to_s3')
+@patch('etl.fetch_leads')
+@patch('etl.incremental_load')
+@patch('etl.backup_mongo_data_to_s3')
+@patch('etl.validate_data')
 def test_etl_failure(mock_validate_data, mock_backup_mongo_data_to_s3, mock_incremental_load, mock_fetch_leads, mock_save_log_to_s3):
     # Mock fetch_leads to raise an exception (simulate a failure)
     mock_fetch_leads.side_effect = Exception('Fetch error')

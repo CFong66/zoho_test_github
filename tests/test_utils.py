@@ -6,7 +6,7 @@ from utils import save_log_to_s3, get_zoho_secret, test_get_access_token, test_d
 from constants import *
 
 # Mock the S3 client interaction for save_log_to_s3 function
-@patch('src.config.boto3.client')
+@patch('config.boto3.client')
 def test_save_log_to_s3(mock_boto_client):
     # Mock S3 client
     mock_s3_client = MagicMock()
@@ -28,7 +28,7 @@ def test_save_log_to_s3(mock_boto_client):
 
 
 # Mock the Secrets Manager client interaction for get_zoho_secret
-@patch('src.config.boto3.client')
+@patch('config.boto3.client')
 def test_get_zoho_secret(mock_boto_client):
     # Mock Secrets Manager client
     mock_secrets_client = MagicMock()
