@@ -2,3 +2,6 @@ boto3==1.28.28
 pymongo==4.3.3
 requests==2.31.0
 botocore==1.31.28
+moto==4.0.0  # For mocking AWS services like S3, SNS, Secrets Manager
+requests-mock==1.10.0  # For mocking HTTP requests (like Zoho API calls)
+pytest==7.4.0  # For running unit tests

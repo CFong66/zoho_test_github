@@ -2,6 +2,8 @@ from datetime import datetime
 import json
 import logging
 from pymongo import MongoClient
+from unittest.mock import patch, MagicMock, mock_open
+import pymongo
 import pymongo
 import requests
 import time
@@ -65,32 +67,28 @@ def get_zoho_secret(secret_name):
     return json.loads(response['SecretString'])
 
 # Fetch the access token
-def get_access_token():
-    """
-    Retrieves a new access token for Zoho CRM using stored credentials.
-    """
-    token_url = build_access_token_url()
-    response = requests.post(token_url)
-    if response.status_code != 200:
-        raise Exception(f"Failed to retrieve access token: {response.text}")
-    return response.json()["access_token"]
+def test_get_access_token():
+    with patch('requests.post') as mock_post:
+        # Mock the response for the access token
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {"access_token": "mock_access_token"}
+
+        # Call the function
+        access_token = test_get_access_token()
+        assert access_token == "mock_access_token"
 
 # Download CA certificate for MongoDB
-def download_ca_certificate():
-    """
-    Downloads the CA certificate for Amazon DocumentDB and saves it locally.
-    """
-    # Construct the URL dynamically
-    url = build_ca_certificate_url(region="global")
-    
-    # Download the certificate
-    response = requests.get(url)
-    if response.status_code == 200:
-        with open(CA_LAMBDA_BUNDLE_PATH, 'wb') as f:
-            f.write(response.content)
-        print(f"CA certificate downloaded successfully to {CA_LAMBDA_BUNDLE_PATH}")
-    else:
-        raise Exception(f"Failed to download CA certificate. HTTP status: {response.status_code}")
+def test_download_ca_certificate():
+    with patch('requests.get') as mock_get:
+        # Mock the certificate download
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.content = b"mock_certificate_content"
+
+        # Mock the file write behavior
+        with patch('builtins.open', mock_open()) as mock_file:
+            test_download_ca_certificate()  # Call the function
+            mock_file.assert_called_once_with(CA_LAMBDA_BUNDLE_PATH, 'wb')
+            mock_file().write.assert_called_once_with(b"mock_certificate_content")
 
 # Get MongoDB credentials from Secrets Manager
 def get_mongo_credentials():
@@ -100,46 +98,25 @@ def get_mongo_credentials():
     return secret['username'], secret['password'], secret['host'], secret['port']
 
 # Function to get the leads collection
-def get_leads_collection():
-    """
-    Connects to MongoDB and retrieves the 'leads' collection. Creates it if it doesn't exist.
+def test_get_leads_collection():
+    with patch('pymongo.MongoClient') as mock_mongo_client:
+        # Mock the MongoDB client and its methods
+        mock_db = MagicMock()
+        mock_collection = MagicMock()
+        mock_db.list_collection_names.return_value = ['existing_collection']
+        mock_db.__getitem__.return_value = mock_collection
+        mock_mongo_client.return_value = mock_db
 
-    Returns:
-        pymongo.collection.Collection: The leads collection object.
-    """
-    # Get MongoDB credentials
-    username, password, host, port = get_mongo_credentials()
+        # Call the function
+        collection = test_get_leads_collection()
 
-    # Build the MongoDB URI
-    mongo_uri = build_mongo_uri(
-        username=username,
-        password=password,
-        host=host,
-        port=port,
-        database=DATABASE,
-        ca_bundle_path=CA_EC2_BUNDLE_PATH,
-    )
-
-    # Connect to MongoDB
-    client = pymongo.MongoClient(mongo_uri)
-
-    # Access the database and the 'leads' collection
-    db = client[DATABASE]
-    collection_name = "leads"
-
-    # Check if the 'leads' collection exists; if not, create it
-    if collection_name not in db.list_collection_names():
-        print(f"Creating collection '{collection_name}' in MongoDB.")
-        db.create_collection(collection_name)
-    else:
-        print(f"Collection '{collection_name}' already exists in MongoDB.")
-
-    # Return the collection object
-    return db[collection_name]
+        # Ensure the collection was retrieved
+        assert collection == mock_collection
+        mock_db.create_collection.assert_not_called()  # Collection already exists
 
 # Retrieve leads from MongoDB
 def get_mongo_leads():
-    leads_collection = get_leads_collection()
+    leads_collection = test_get_leads_collection()
     leads = list(leads_collection.find({}, {"_id": 0}))
     return {lead["Email"]: lead for lead in leads}
 
@@ -160,7 +137,7 @@ def backup_mongo_data_to_s3():
 
         # Fetch leads data from MongoDB
         print("Fetching leads data from MongoDB...")
-        leads_collection = get_leads_collection()
+        leads_collection = test_get_leads_collection()
         mongo_leads = list(leads_collection.find({}, {"_id": 0}))  # Exclude the '_id' field from MongoDB
         print(f"Fetched {len(mongo_leads)} records from MongoDB.")
 

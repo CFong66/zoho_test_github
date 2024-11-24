@@ -1,9 +1,12 @@
 import boto3
 from constants import REGION_NAME
 
-# Initialize S3, secret manager and CloudWatch clients
-cloudwatch_client = boto3.client('cloudwatch', region_name=REGION_NAME)
-s3_client = boto3.client('s3', region_name=REGION_NAME)
-secrets_client = boto3.client('secretsmanager', region_name=REGION_NAME)
-sns_client = boto3.client('sns', region_name=REGION_NAME)
-ssm_client = boto3.client('ssm', region_name='ap-southeast-2')
+# Clients with optional dependency injection
+def get_boto3_client(service_name, region=REGION_NAME, mock_client=None):
+    return mock_client or boto3.client(service_name, region_name=region)
+
+cloudwatch_client = get_boto3_client("cloudwatch")
+s3_client = get_boto3_client("s3")
+secrets_client = get_boto3_client("secretsmanager")
+sns_client = get_boto3_client("sns")
+ssm_client = get_boto3_client("ssm", region="ap-southeast-2")
